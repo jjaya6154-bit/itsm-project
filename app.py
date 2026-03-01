@@ -290,16 +290,19 @@ def logout():
     logout_user()
     return redirect('/login')
 
-# ---------------- MAIN ----------------
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        if not User.query.filter_by(username='admin').first():
-            admin = User(username='admin', password=generate_password_hash('admin123'))
-            db.session.add(admin)
-            db.session.commit()
-    
-    if __name__ == "__main__":
-     import os
+# ---------------- DATABASE INIT ----------------
+with app.app_context():
+    db.create_all()
+    if not User.query.filter_by(username='admin').first():
+        admin = User(
+            username='admin',
+            password=generate_password_hash('admin123')
+        )
+        db.session.add(admin)
+        db.session.commit()
+
+# ---------------- RUN SERVER ----------------
+if __name__ == "__main__":
+    import os
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
