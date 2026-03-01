@@ -291,15 +291,18 @@ def logout():
     return redirect('/login')
 
 # ---------------- MAIN ----------------
-if __name__ == '__main__':
+if __name__ == "__main__":
+    import os
+
     with app.app_context():
         db.create_all()
         if not User.query.filter_by(username='admin').first():
-            admin = User(username='admin', password=generate_password_hash('admin123'))
+            admin = User(
+                username='admin',
+                password=generate_password_hash('admin123')
+            )
             db.session.add(admin)
             db.session.commit()
-    import os
 
-if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
