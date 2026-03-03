@@ -1,3 +1,4 @@
+from flask import send_file
 from flask import Flask, request, redirect, render_template_string
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
@@ -89,78 +90,170 @@ def dashboard():
     routers = Asset.query.filter_by(category='Router').count()
 
     return render_template_string("""
-    <!doctype html>
-    <html lang="en">
-    <head>
-      <meta charset="utf-8">
-      <title>IT Infra Dashboard</title>
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    </head>
-    <body>
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-2 bg-dark text-white vh-100 p-3">
-            <h4>IT Admin</h4>
-            <a href="/dashboard" class="text-white d-block my-2">Dashboard</a>
-            <a href="/catalog" class="text-white d-block my-2">Catalog</a>
-            <a href="/add" class="text-white d-block my-2">Add Asset</a>
-            <a href="/backup" class="text-white d-block my-2">Backup DB</a>
-            <a href="/logout" class="text-white d-block my-2">Logout</a>
-          </div>
-          <div class="col-10 p-4">
-            <h2>Dashboard</h2>
-            <div class="row mt-4 g-3">
-              <div class="col-md-3">
-                <div class="card text-center text-white bg-primary">
-                  <div class="card-body">
-                    <h5>Total Assets</h5>
-                    <h3>{{total}}</h3>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <div class="card text-center text-white bg-success">
-                  <div class="card-body">
-                    <h5>Available</h5>
-                    <h3>{{available}}</h3>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <div class="card text-center text-dark bg-warning">
-                  <div class="card-body">
-                    <h5>In Use</h5>
-                    <h3>{{inuse}}</h3>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <div class="card text-center text-white bg-danger">
-                  <div class="card-body">
-                    <h5>Maintenance</h5>
-                    <h3>{{maintenance}}</h3>
-                  </div>
-                </div>
-              </div>
-            </div>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IT Infra Dashboard</title>
 
-            <hr>
-            <h4>Capacity Management</h4>
-            <div class="row g-3">
-              <div class="col-md-2"><div class="card p-2 text-center">Servers<br><strong>{{servers}}</strong></div></div>
-              <div class="col-md-2"><div class="card p-2 text-center">Laptops<br><strong>{{laptops}}</strong></div></div>
-              <div class="col-md-2"><div class="card p-2 text-center">Software<br><strong>{{software}}</strong></div></div>
-              <div class="col-md-2"><div class="card p-2 text-center">Apps<br><strong>{{apps}}</strong></div></div>
-              <div class="col-md-2"><div class="card p-2 text-center">Routers<br><strong>{{routers}}</strong></div></div>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+        background: linear-gradient(to right, #1e3c72, #2a5298);
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    .sidebar {
+        background-color: #0f1c3f;
+        min-height: 100vh;
+    }
+
+    .sidebar a {
+        color: white;
+        text-decoration: none;
+        display: block;
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 5px;
+    }
+
+    .sidebar a:hover {
+        background-color: #1e3c72;
+    }
+
+    .card {
+        border-radius: 15px;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        transition: 0.3s;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+    }
+
+    .main-container {
+        background-color: white;
+        border-radius: 20px;
+        padding: 30px;
+    }
+
+    @media (max-width: 768px) {
+        .sidebar {
+            min-height: auto;
+        }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container-fluid">
+  <div class="row">
+
+    <!-- Sidebar -->
+    <nav class="col-md-2 col-lg-2 d-md-block sidebar collapse show p-3">
+      <h5 class="text-white text-center mb-4">IT ADMIN</h5>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/catalog">Catalog</a>
+      <a href="/add">Add Asset</a>
+      <a href="/backup">Backup DB</a>
+      <a href="/logout">Logout</a>
+    </nav>
+
+    <!-- Main -->
+    <main class="col-md-10 col-lg-10 ms-sm-auto px-md-4 py-4">
+      <div class="main-container">
+
+        <h2 class="mb-4 text-primary fw-bold">IT Infrastructure Dashboard</h2>
+
+        <!-- Stats -->
+        <div class="row g-4">
+
+          <div class="col-12 col-sm-6 col-lg-3">
+            <div class="card text-center p-3">
+              <h6>Total Assets</h6>
+              <h3>{{total}}</h3>
             </div>
           </div>
+
+          <div class="col-12 col-sm-6 col-lg-3">
+            <div class="card text-center p-3">
+              <h6>Available</h6>
+              <h3>{{available}}</h3>
+            </div>
+          </div>
+
+          <div class="col-12 col-sm-6 col-lg-3">
+            <div class="card text-center p-3">
+              <h6>In Use</h6>
+              <h3>{{inuse}}</h3>
+            </div>
+          </div>
+
+          <div class="col-12 col-sm-6 col-lg-3">
+            <div class="card text-center p-3">
+              <h6>Maintenance</h6>
+              <h3>{{maintenance}}</h3>
+            </div>
+          </div>
+
         </div>
+
+        <hr class="my-4">
+
+        <!-- Capacity -->
+        <h4 class="text-primary fw-bold mb-3">Capacity Overview</h4>
+
+        <div class="row g-3">
+
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="card text-center p-2">
+              Servers<br><strong>{{servers}}</strong>
+            </div>
+          </div>
+
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="card text-center p-2">
+              Laptops<br><strong>{{laptops}}</strong>
+            </div>
+          </div>
+
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="card text-center p-2">
+              Software<br><strong>{{software}}</strong>
+            </div>
+          </div>
+
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="card text-center p-2">
+              Apps<br><strong>{{apps}}</strong>
+            </div>
+          </div>
+
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="card text-center p-2">
+              Routers<br><strong>{{routers}}</strong>
+            </div>
+          </div>
+
+        </div>
+
       </div>
-    </body>
-    </html>
-    """, total=total, available=available, inuse=inuse,
-       maintenance=maintenance, servers=servers, laptops=laptops,
-       software=software, apps=apps, routers=routers)
+    </main>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
+""", total=total, available=available, inuse=inuse,
+   maintenance=maintenance, servers=servers, laptops=laptops,
+   software=software, apps=apps, routers=routers)
 
 # ---------------- ADD ASSET ----------------
 @app.route('/add', methods=['GET','POST'])
@@ -265,13 +358,19 @@ def catalog():
 @app.route('/backup')
 @login_required
 def backup():
-    db_path = "itsm.db"
-    backup_path = "backup_itsm.db"
+    db_path = os.path.join(app.instance_path, "itsm.db")
+    backup_path = os.path.join(app.instance_path, "backup_itsm.db")
+
     if os.path.exists(db_path):
         with open(db_path, 'rb') as f:
             with open(backup_path, 'wb') as b:
                 b.write(f.read())
-        return "<h3 class='text-success text-center mt-5'>Backup Created Successfully!</h3>"
+
+        return send_file(
+            backup_path,
+            as_attachment=True
+        )
+
     return "<h3 class='text-danger text-center mt-5'>Database not found</h3>"
 
 # ---------------- DELETE ----------------
@@ -293,16 +392,31 @@ def logout():
 # ---------------- DATABASE INIT ----------------
 with app.app_context():
     db.create_all()
+
+    # Create default admin
     if not User.query.filter_by(username='admin').first():
         admin = User(
             username='admin',
             password=generate_password_hash('admin123')
         )
         db.session.add(admin)
-        db.session.commit()
+
+    # Add sample assets if table is empty
+    if not Asset.query.first():
+        sample_assets = [
+            Asset(name="Main Web Server", category="Server", status="Available", created_at=str(datetime.datetime.now())),
+            Asset(name="HR Laptop 01", category="Laptop", status="In Use", created_at=str(datetime.datetime.now())),
+            Asset(name="Finance Software", category="Software", status="Available", created_at=str(datetime.datetime.now())),
+            Asset(name="CRM Application", category="App", status="Maintenance", created_at=str(datetime.datetime.now())),
+            Asset(name="Core Router", category="Router", status="Available", created_at=str(datetime.datetime.now()))
+        ]
+
+        db.session.add_all(sample_assets)
+
+    db.session.commit()
 
 # ---------------- RUN SERVER ----------------
 if __name__ == "__main__":
     import os
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 5001))
     app.run(host="0.0.0.0", port=port)
