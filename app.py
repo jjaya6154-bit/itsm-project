@@ -14,11 +14,14 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-# ✅ ADD THIS PART
+# ✅ Login Manager Setup (ONLY THIS ONCE)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
+# ---------------- MODELS ----------------
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
 # ---------------- MODELS ----------------
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
