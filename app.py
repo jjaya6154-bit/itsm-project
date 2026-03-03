@@ -7,11 +7,13 @@ import datetime
 import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'infra_secret'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///itsm.db'
+
+import os
+app.config['SECRET_KEY'] = 'your_secret_key_here'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", "sqlite:///database.db")
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 db = SQLAlchemy(app)
-login_manager = LoginManager(app)
-login_manager.login_view = 'login'
 
 # ---------------- MODELS ----------------
 class User(UserMixin, db.Model):
