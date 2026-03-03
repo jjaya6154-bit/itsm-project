@@ -8,8 +8,14 @@ import os
 
 app = Flask(__name__)
 
+if not os.path.exists("instance"):
+    os.makedirs("instance")
+
 app.config['SECRET_KEY'] = 'your_secret_key_here'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", "sqlite:///database.db")
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+    "DATABASE_URL",
+    "sqlite:///instance/database.db"
+)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -19,9 +25,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
-# ---------------- MODELS ----------------
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+
 # ---------------- MODELS ----------------
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
