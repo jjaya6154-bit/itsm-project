@@ -5,20 +5,27 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 import os
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-if not os.path.exists("instance"):
-    os.makedirs("instance")
-
+# Secret key
 app.config['SECRET_KEY'] = 'your_secret_key_here'
+
+# Database configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
     "DATABASE_URL",
-    "sqlite:///instance/database.db"
+    "sqlite:///database.db"   # ✅ Removed instance/
 )
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Initialize database
 db = SQLAlchemy(app)
+
+# Create tables automatically
+with app.app_context():
+    db.create_all()
 
 # ✅ Login Manager Setup (ONLY THIS ONCE)
 login_manager = LoginManager()
